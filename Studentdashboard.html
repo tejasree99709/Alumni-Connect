@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    body { margin:0; padding:0; font-family:'Segoe UI', Arial, sans-serif; background:#f4f8fb; color:#1a2236; }
+    .dashboard-layout { display:flex; min-height:100vh; background:#f4f8fb; }
+    .sidebar { width:260px; background:linear-gradient(160deg,#1d3354 0%,#0072ff 100%); color:#fff; display:flex; flex-direction:column; align-items:flex-start; min-height:100vh; }
+    .sidebar-profile { width:100%; display:flex; align-items:center; gap:15px; padding:36px 24px 24px 24px; border-bottom:1px solid #26446c44; }
+    .sidebar-profile img { width:70px; height:70px; border-radius:50%; background:#fff; border:2.5px solid #fff; box-shadow:0 2px 12px #0072ff22; }
+    .profile-info { display:flex; flex-direction:column; }
+    .profile-name { font-size:1.25em; font-weight:600; color:#ffe082; margin-bottom:3px; }
+    .profile-email { font-size:0.97em; color:#e0e7ef; }
+    .sidebar nav { width:100%; flex:1; }
+    .sidebar nav ul { list-style:none; margin:0; padding:0; }
+    .sidebar nav li { width:100%; }
+    .sidebar nav a { display:flex; align-items:center; color:#fff; padding:14px 30px; text-decoration:none; font-size:1.09em; letter-spacing:0.4px; border-left:5px solid transparent; transition: background 0.18s, border-left 0.18s, color 0.17s; margin-bottom:3px; }
+    .sidebar nav a i { margin-right:17px; font-size:1.19em; }
+    .sidebar nav a:hover, .sidebar nav a:focus { background:#185abd; border-left:5px solid #ffe082; color:#ffe082; }
+    .logout-btn { margin:20px auto; background:#ff4757; border:none; padding:10px 20px; border-radius:6px; color:#fff; font-weight:600; cursor:pointer; transition:background 0.2s; }
+    .logout-btn:hover { background:#e84118; }
+
+    .main-content { flex:1; padding:0 48px; background:#f4f8fb; display:flex; flex-direction:column; }
+    .topnav { display:flex; align-items:center; justify-content:space-between; background:#fff; padding:22px 0; border-bottom:1.5px solid #e5e7eb; margin-bottom:18px; }
+    .system-title { font-size:1.28em; font-weight:600; color:#1d3354; letter-spacing:1.1px; }
+    .system-title i { color:#0072ff; margin-right:10px; }
+    .profile-avatar { width:52px; height:52px; border-radius:50%; display:block; overflow:hidden; border:2.5px solid #0072ff; box-shadow:0 4px 18px 0 #0072ff23; transition:box-shadow 0.17s, transform 0.17s, border 0.16s; }
+    .profile-avatar img { width:100%; height:100%; object-fit:cover; }
+    .profile-avatar:hover { box-shadow:0 6px 30px 0 #ffe082aa; border-color:#ffe082; transform:scale(1.08) rotate(-2deg); }
+    .dashboard-heading { font-size:1.18em; color:#1d3354; font-weight:500; margin:28px 0 20px 0; letter-spacing:0.7px; }
+    .card-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:30px; margin-bottom:40px; }
+    .dashboard-card { background:#fff; border-radius:13px; box-shadow:0 4px 22px 0 #0072ff0c; display:flex; flex-direction:column; align-items:center; padding:34px 16px 28px 16px; transition: box-shadow 0.21s, transform 0.18s; border-top:5px solid #ffe082; }
+    .dashboard-card:hover { box-shadow:0 8px 44px 0 #0072ff18; transform:translateY(-6px) scale(1.03); }
+    .card-icon { margin-bottom:13px; font-size:2.7em; }
+    .card-title { font-size:1.14em; font-weight:600; color:#1d3354; margin-bottom:9px; }
+    .card-btn { background:linear-gradient(90deg,#0072ff 0%,#36d1c4 100%); color:#fff; border:none; border-radius:6px; padding:8px 20px; font-size:0.96em; font-weight:500; text-decoration:none; margin-top:7px; cursor:pointer; box-shadow:0 2px 8px #0072ff22; transition: background 0.18s, transform 0.13s; display:inline-block; }
+    .card-btn:hover { background:linear-gradient(90deg,#36d1c4 0%,#0072ff 100%); color:#ffe082; transform:scale(1.04); }
+  </style>
+</head>
+<body>
+  <div class="dashboard-layout">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-profile">
+        <img id="profileImage" src="https://ui-avatars.com/api/?name=User&background=0072ff&color=fff&rounded=true" alt="Profile" />
+        <div class="profile-info">
+          <span class="profile-name" id="profileName">Loading...</span>
+          <span class="profile-email" id="profileEmail">Loading...</span>
+        </div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#"><i class="fa-solid fa-user"></i> Profile Summary</a></li>
+          <li><a href="#"><i class="fa-solid fa-newspaper"></i> Recent Announcements</a></li>
+          <li><a href="#"><i class="fa-solid fa-calendar-days"></i> Upcoming Events</a></li>
+          <li><a href="#"><i class="fa-solid fa-users"></i> Networking</a></li>
+          <li><a href="#"><i class="fa-solid fa-comments"></i> Messaging</a></li>
+        </ul>
+      </nav>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="topnav">
+        <span class="system-title"><i class="fa-solid fa-graduation-cap"></i> STUDENT DASHBOARD</span>
+        <a href="profile-edit.html" class="profile-avatar">
+          <img id="topProfileImage" src="https://ui-avatars.com/api/?name=User&background=0072ff&color=fff&rounded=true" alt="Update Profile" />
+        </a>
+      </div>
+      
+      <h2 class="dashboard-heading" id="welcomeMessage">Welcome Back!</h2>
+      <div class="card-grid">
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fa-solid fa-newspaper"></i></div>
+          <div class="card-title">Recent Announcements</div>
+          <a href="announcements_student.html" class="card-btn">View Announcements</a>
+        </div>
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fa-solid fa-calendar-days"></i></div>
+          <div class="card-title">Upcoming Events</div>
+          <a href="viewevents.html" class="card-btn">View Events</a>
+        </div>
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fa-solid fa-users"></i></div>
+          <div class="card-title">Jobs</div>
+          <a href="view_jobs.html" class="card-btn">Apply Now</a>
+        </div>
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fa-solid fa-comments"></i></div>
+          <div class="card-title">Updates</div>
+          <a href="view_updates.html" class="card-btn">view updates</a>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="javascript-files/amazon-cognito-identity.min.js"></script>
+  <script>
+    var poolData = {
+      UserPoolId : 'us-east-1_wZ1ovu0QY',
+      ClientId : '1cdbrfng4l7pe7n60597rejh34'
+    };		
+    var userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+    var cognitoUser = userPool.getCurrentUser();
+
+    if (cognitoUser) {
+      cognitoUser.getSession(function(err, session) {
+        if (err || !session.isValid()) {
+          window.location.replace("LoginForm.html");
+          return;
+        }
+        cognitoUser.getUserAttributes(function(err, attributes) {
+          if (err) return;
+          var name = attributes.find(attr => attr.Name === 'name')?.Value || "Student";
+          var email = attributes.find(attr => attr.Name === 'email')?.Value || "student@example.com";
+          document.getElementById('profileName').innerText = name;
+          document.getElementById('profileEmail').innerText = email;
+          document.getElementById('welcomeMessage').innerText = "Welcome Back, " + name + "!";
+          document.getElementById('profileImage').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0072ff&color=fff&rounded=true`;
+          document.getElementById('topProfileImage').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0072ff&color=fff&rounded=true`;
+        });
+      });
+    } else {
+      window.location.replace("LoginForm.html");
+    }
+
+    function logout() {
+      if (cognitoUser) {
+        cognitoUser.signOut();
+      }
+      window.location.replace("Webpage.html");
+    }
+  </script>
+</body>
+</html>

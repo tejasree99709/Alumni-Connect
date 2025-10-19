@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login / Signup</title>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="css-files/bootstrap.min.css">
+  <link rel="stylesheet" href="LoginForm.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- AWS Cognito SDKs -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+  <script src="https://sdk.amazonaws.com/js/aws-sdk-2.7.16.min.js"></script>
+  <script src="javascript-files/amazon-cognito-identity.min.js"></script>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="container col-lg-4 col-md-5 col-sm-8 col-xs-10">
+      <div class="tab-container">
+        <div class="tab signup active">Sign Up</div>
+        <div class="tab login">Log In</div>
+      </div>
+
+      <!-- Signup form -->
+      <div class="signup-form">
+        <label for="type">Sign Up as</label>
+        <select name="type" class="input" onchange="selectUser()" id="user">
+          <option>Click Here</option>
+          <option>Alumni</option>
+          <option>Student</option>
+          <option>College</option>
+        </select>
+        <input type="text" placeholder="Enter Name" class="input" id="personalname">
+        <input type="email" placeholder="Enter Email Address" class="input" id="email">
+        <input type="password" placeholder="Choose a Password" class="input" id="password">
+        <input type="password" placeholder="Re-enter Password" class="input" id="confirm">
+        <div class="btn" onclick="registerButton()">Create account</div>
+      </div>
+      
+      <!-- Login form -->
+      <div class="login-form" style="display:none;">
+        <label for="type">Login as</label>
+        <select name="type" class="input" id="loginUser">
+          <option>Alumni</option>
+          <option>College</option>
+          <option>Student</option>
+        </select>
+        <input type="email" placeholder="Email" class="input" id="inputEmail">
+        <input type="password" placeholder="Password" class="input" id="inputPassword">
+        <div id="loginError" style="color:red; font-size:14px; margin-bottom:10px; display:none;"></div>
+        <div class="btn" onclick="signInButton()">Log in</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toggle forms -->
+  <script>
+    $(".login-form").hide();
+    $(".login").click(function(){
+      $(".signup-form").hide();
+      $(".login-form").show();
+      $(".signup").removeClass("active");
+      $(".login").addClass("active");
+    });
+    $(".signup").click(function(){
+      $(".signup-form").show();
+      $(".login-form").hide();
+      $(".login").removeClass("active");
+      $(".signup").addClass("active");
+    });
+  </script>
+
+  <!-- AWS Cognito Logic -->
+  <script>
+    let userType = "";
+
+    function selectUser() {
+      const signupSelect = document.getElementById("user");
+      const loginSelect = document.getElementById("loginUser");
+      userType = signupSelect && signupSelect.value !== "Click Here" ? signupSelect.value : loginSelect.value;
+    }
+
+    // ---------- SIGNUP ----------
+    function registerButton() {
+      const name = document.getElementById("personalname").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirm").value;
+
+      if (!name || !email || !password || !confirmPassword) {
+        alert("Please fill all fields!");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+      }
+
+      // Hardcoded College Signup
+      if (userType === "College") {
+        const hardcodedEmail = "college@gmail.com";
+        const hardcodedPassword = "College123";
+        if (email === hardcodedEmail && password === hardcodedPassword) {
+          alert("College signup successful!");
+          window.location.replace("CollegeDashboard.html");
+        } else {
+          alert('For College, use:\nEmail: ${hardcodedEmail}\nPassword: ${hardcodedPassword}');
+        }
+        return;
+      }
+
+      // Cognito Signup
+      const poolData = {
+        UserPoolId: "us-east-1_wZ1ovu0QY",
+        ClientId: "1cdbrfng4l7pe7n60597rejh34"
+      };
+      const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+
+      const attributeList = [];
+      attributeList.push(new AmazonCognitoIdentity.CognitoUserAttribute({ Name: 'email', Value: email }));
+      attributeList.push(new AmazonCognitoIdentity.CognitoUserAttribute({ Name: 'name', Value: name }));
+      attributeList.push(new AmazonCognitoIdentity.CognitoUserAttribute({ Name: 'custom:role', Value: userType }));
+
+      userPool.signUp(email, password, attributeList, null, function(err, result) {
+        if (err) {
+          alert(err.message || JSON.stringify(err));
+          return;
+        }
+        alert("Signup successful! Please check your email for verification.");
+        window.location.replace("verify.html?username=" + encodeURIComponent(email));
+      });
+    }
+
+    // ---------- LOGIN ----------
+    function signInButton() {
+      const email = document.getElementById("inputEmail").value.trim();
+      const password = document.getElementById("inputPassword").value;
+      const selectedRole = document.getElementById("loginUser").value;
+      const errorDiv = document.getElementById("loginError");
+      errorDiv.style.display = "none";
+
+      if (!email || !password) {
+        errorDiv.innerText = "Please enter email and password!";
+        errorDiv.style.display = "block";
+        return;
+      }
+
+      // Hardcoded College Login
+      if (selectedRole === "College") {
+        if (email === "college@gmail.com" && password === "College123") {
+          window.location.replace("Admindashboard.html");
+        } else {
+          errorDiv.innerText = "Invalid College credentials!";
+          errorDiv.style.display = "block";
+        }
+        return;
+      }
+
+      // Cognito Login
+      const poolData = {
+        UserPoolId: "us-east-1_wZ1ovu0QY",
+        ClientId: "1cdbrfng4l7pe7n60597rejh34"
+      };
+      const authenticationData = { Username: email, Password: password };
+      const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
+      const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
+      const userData = { Username: email, Pool: userPool };
+      const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+
+      cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess: function(result) {
+          cognitoUser.getUserAttributes(function(err, attributes) {
+            if (err) {
+              errorDiv.innerText = "Error fetching user details!";
+              errorDiv.style.display = "block";
+              return;
+            }
+
+            let role = null;
+            attributes.forEach(attr => {
+              if (attr.getName().toLowerCase() === "custom:role") role = attr.getValue().toLowerCase().trim();
+            });
+
+            // Check if role matches selectedRole
+            if ((selectedRole.toLowerCase() === "student" && role === "student") ||
+                (selectedRole.toLowerCase() === "alumni" && role === "alumni")) {
+              if (role === "student") window.location.replace("StudentDashboard.html");
+              else if (role === "alumni") window.location.replace("AlumniDashboard.html");
+            } else {
+              errorDiv.innerText = "Incorrect role selected!";
+              errorDiv.style.display = "block";
+            }
+          });
+        },
+        onFailure: function(err) {
+          if (err.code === "NotAuthorizedException") errorDiv.innerText = "Incorrect username or password!";
+          else if (err.code === "UserNotFoundException") errorDiv.innerText = "User does not exist!";
+          else errorDiv.innerText = err.message || JSON.stringify(err);
+          errorDiv.style.display = "block";
+        }
+      });
+    }
+  </script>
+
+  <!-- Bootstrap scripts -->
+  <script src="javascript-files/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script src="javascript-files/bootstrap.js"></script>
+</body>
+</html>

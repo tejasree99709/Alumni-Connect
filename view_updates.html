@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alumni Updates Feed | Alumni Connect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f3f2ef;
+      margin: 0;
+      padding: 0;
+    }
+    .topbar {
+      background-color: #1c2434;
+      color: #fff;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .topbar h1 {
+      font-size: 1.5rem;
+      margin: 0 auto;
+    }
+    .feed-container {
+      max-width: 800px;
+      margin: 30px auto;
+    }
+    .post-card {
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .post-header img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 15px;
+      background-color: #ccc;
+    }
+    .post-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .post-date {
+      font-size: 0.85rem;
+      color: gray;
+    }
+    .post-description {
+      margin: 10px 0;
+      line-height: 1.5;
+    }
+    .post-link a {
+      color: #0a66c2;
+      text-decoration: none;
+    }
+    .post-photo {
+      width: 100%;
+      max-height: 400px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <h1><i class="fas fa-newspaper"></i> Alumni Feed</h1>
+    <a href="Studentdashboard.html" class="btn btn-danger"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
+
+  <div class="feed-container" id="feedContainer">
+    <!-- Posts will load here dynamically -->
+  </div>
+
+  <script>
+    const API_URL = "https://l1icaox9v8.execute-api.us-east-1.amazonaws.com/submit"; 
+
+    async function loadUpdates() {
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "view" })
+        });
+        const result = await res.json();
+        const updates = result.data || [];
+        const feedContainer = document.getElementById("feedContainer");
+        feedContainer.innerHTML = "";
+
+        updates.reverse().forEach(upd => {
+          const postCard = document.createElement("div");
+          postCard.classList.add("post-card");
+
+          postCard.innerHTML = `
+            <div class="post-header">
+              <img src="${upd.photoUrl || 'https://via.placeholder.com/50'}" alt="Post Image">
+              <div>
+                <div class="post-name">${upd.name}</div>
+                <div class="post-date">${upd.createdAt ? new Date(upd.createdAt).toLocaleString() : ''}</div>
+              </div>
+            </div>
+            <div class="post-description">${upd.description || ''}</div>
+            <div class="post-link">${upd.link ? `<a href="${upd.link}" target="_blank">${upd.link}</a>` : ''}</div>
+            ${upd.photoUrl ? `<img src="${upd.photoUrl}" class="post-photo">` : ''}
+          `;
+
+          feedContainer.appendChild(postCard);
+        });
+      } catch (err) {
+        console.error("Error loading updates:", err);
+      }
+    }
+
+    window.onload = loadUpdates;
+  </script>
+</body>
+</html>

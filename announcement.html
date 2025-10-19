@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Announcements | Alumni Connect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #b1e5f2;
+      margin: 0;
+      padding: 0;
+    }
+    .topbar {
+      background-color: #1c2434;
+      color: #fff;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .topbar h1 {
+      font-size: 1.5rem;
+      margin: 0 auto;
+    }
+    .form-container {
+      max-width: 950px;
+      margin: 40px auto;
+      background: #2f3d5a;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .form-container .form-label {
+      color: #ffffff;
+      font-weight: 500;
+    }
+    .btn-custom {
+      background-color: #b1e5f2;
+      color: #000000;
+      border-radius: 5px;
+    }
+    .btn-custom:hover {
+      background-color: #a0d6e8;
+    }
+    .nav-tabs .nav-link.active {
+      background-color: #b1e5f2;
+      color: #000000;
+      border-radius: 5px 5px 0 0;
+    }
+    .nav-tabs .nav-link {
+      border: none;
+      color: #fff;
+    }
+    .announcement-table {
+      background-color: #ffffff;
+      color: #000000;
+      margin-top: 20px;
+    }
+    .announcement-table th, .announcement-table td {
+      vertical-align: middle;
+      text-align: center;
+    }
+    .announcement-table th {
+      background-color: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <h1><i class="fas fa-bullhorn"></i> Manage Announcements</h1>
+    <a href="Admindashboard.html" class="btn btn-danger"><i class="fas fa-arrow-left"></i> Back</a>
+  </div>
+
+  <div class="form-container">
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-3" id="announcementTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="create-tab" data-bs-toggle="tab" data-bs-target="#create" type="button" role="tab">Create</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="update-tab" data-bs-toggle="tab" data-bs-target="#update" type="button" role="tab">Update</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="delete-tab" data-bs-toggle="tab" data-bs-target="#delete" type="button" role="tab">Delete</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="view-tab" data-bs-toggle="tab" data-bs-target="#view" type="button" role="tab">View</button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="announcementTabContent">
+      <!-- Create Announcement -->
+      <div class="tab-pane fade show active" id="create" role="tabpanel">
+        <form id="createAnnouncementForm">
+          <div class="mb-3">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-control" name="title" placeholder="Enter title" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Audience</label>
+            <select class="form-control" name="audience" required>
+              <option disabled selected>Select audience</option>
+              <option>Students</option>
+              <option>Alumni</option>
+              <option>Both</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="description" rows="4" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Valid Until</label>
+            <input type="date" class="form-control" name="validUntil">
+          </div>
+          <button type="submit" class="btn btn-custom w-100"><i class="fas fa-paper-plane"></i> Create Announcement</button>
+        </form>
+      </div>
+
+      <!-- Update Announcement -->
+      <div class="tab-pane fade" id="update" role="tabpanel">
+        <form id="updateAnnouncementForm">
+          <div class="mb-3">
+            <label class="form-label">Title (Identifier)</label>
+            <input type="text" class="form-control" name="title" placeholder="Existing announcement title" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">New Description</label>
+            <textarea class="form-control" name="description" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">New Valid Until</label>
+            <input type="date" class="form-control" name="validUntil">
+          </div>
+          <button type="submit" class="btn btn-custom w-100"><i class="fas fa-edit"></i> Update Announcement</button>
+        </form>
+      </div>
+
+      <!-- Delete Announcement -->
+      <div class="tab-pane fade" id="delete" role="tabpanel">
+        <form id="deleteAnnouncementForm">
+          <div class="mb-3">
+            <label class="form-label">Title (Identifier)</label>
+            <input type="text" class="form-control" name="title" placeholder="Enter title to delete" required>
+          </div>
+          <button type="submit" class="btn btn-custom w-100"><i class="fas fa-trash"></i> Delete Announcement</button>
+        </form>
+      </div>
+
+      <!-- View Announcements -->
+      <div class="tab-pane fade" id="view" role="tabpanel">
+        <table class="table table-bordered announcement-table" id="announcementTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Title</th>
+              <th>Audience</th>
+              <th>Description</th>
+              <th>Valid Until</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Announcements load dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_URL = "https://f1n8vn9o03.execute-api.us-east-1.amazonaws.com/submit"; 
+
+    // ✅ Create
+    document.getElementById("createAnnouncementForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target).entries());
+      data.action = "create";
+      await sendData(data);
+      e.target.reset();
+    });
+
+    // ✅ Update
+    document.getElementById("updateAnnouncementForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target).entries());
+      data.action = "update";
+      await sendData(data);
+      e.target.reset();
+    });
+
+    // ✅ Delete
+    document.getElementById("deleteAnnouncementForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target).entries());
+      data.action = "delete";
+      await sendData(data);
+      e.target.reset();
+    });
+
+    // ✅ View
+    async function loadAnnouncements() {
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "view" }),
+        });
+        const result = await res.json();
+        const announcements = result.data || [];
+        const tbody = document.querySelector("#announcementTable tbody");
+        tbody.innerHTML = "";
+        announcements.forEach((a, i) => {
+          const row = `<tr>
+            <td>${i + 1}</td>
+            <td>${a.title}</td>
+            <td>${a.audience}</td>
+            <td>${a.description}</td>
+            <td>${a.validUntil || "-"}</td>
+          </tr>`;
+          tbody.innerHTML += row;
+        });
+      } catch (err) {
+        console.error("Error loading announcements:", err);
+      }
+    }
+
+    // ✅ Reusable API call
+    async function sendData(data) {
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        const result = await res.json();
+        alert(result.message || "Done!");
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    }
+
+    // Load announcements when "View" tab is clicked
+    document.getElementById("view-tab").addEventListener("click", loadAnnouncements);
+  </script>
+</body>
+</html>
